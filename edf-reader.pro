@@ -9,7 +9,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 CONFIG += c++11
 
-TARGET = interaction-example
+TARGET = edf-reader
 TEMPLATE = app
 
 SOURCES += main.cpp\
