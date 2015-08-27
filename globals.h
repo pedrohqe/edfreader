@@ -28,6 +28,7 @@ extern QStringList all;
 extern QStringList shown;
 extern QStringList notshown;
 extern QString spike;
+extern QStringList shownspikes;
 extern QString header;
 extern struct edf_hdr_struct hdr;
 extern QMap<QString, int> labelchannel;

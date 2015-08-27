@@ -90,6 +90,7 @@
      <string>Spike</string>
     </property>
     <addaction name="actionFilter"/>
+    <addaction name="actionDetect_All"/>
    </widget>
    <widget class="QMenu" name="menuInfo">
     <property name="title">
@@ -132,7 +133,7 @@
   </action>
   <action name="actionFilter">
    <property name="text">
-    <string>Filter...</string>
+    <string>Detect...</string>
    </property>
   </action>
   <action name="actionHeader_Info">
@@ -148,6 +149,11 @@
   <action name="actionHelp">
    <property name="text">
     <string>Help</string>
+   </property>
+  </action>
+  <action name="actionDetect_All">
+   <property name="text">
+    <string>Detect All</string>
    </property>
   </action>
  </widget>

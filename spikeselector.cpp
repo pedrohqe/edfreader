@@ -7,7 +7,9 @@ SpikeSelector::SpikeSelector(QWidget *parent) :
     ui(new Ui::SpikeSelector)
 {
     ui->setupUi(this);
-    ui->spikesBox->addItems(shown);
+    foreach (QString str, shown) {
+      if(!shownspikes.contains(str))  ui->spikesBox->addItem(str);
+    }
 }
 
 

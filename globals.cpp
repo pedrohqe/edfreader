@@ -21,6 +21,7 @@ QString filenameg;
 QStringList all;
 QStringList shown;
 QStringList notshown;
+QStringList shownspikes;
 QString spike;
 QString header;
 QMap<QString, int> labelchannel;

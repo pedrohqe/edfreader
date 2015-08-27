@@ -47,6 +47,8 @@ private slots:
 
   void on_actionHelp_triggered();
 
+  void on_actionDetect_All_triggered();
+
 private:
   Ui::MainWindow *ui;
 };

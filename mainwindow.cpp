@@ -238,6 +238,7 @@ void MainWindow::removeAllGraphs()
   notshown.sort();
   ui->customPlot->replot();
   totalGraphs = 0;
+  shownspikes.clear();
   QMap<QString, int>::iterator i;
   for (i = labelposition.begin(); i != labelposition.end(); ++i)
       i.value() = -1;
@@ -386,7 +387,7 @@ void MainWindow::insertSpikeGraph(QCustomPlot *customPlot, QString label){
     for (int i=0; i<nsamples; ++i)
     {
       x[i] = start_time + i*time_interval; //
-      y[i] = buf[i] + labelposition[label]*3000;  //
+      y[i] = buf[i] + labelposition[label]*300;  //
     }
 
     edfclose_file(hdl);
@@ -423,7 +424,6 @@ void MainWindow::insertSpikeGraph(QCustomPlot *customPlot, QString label){
     //set spike data to the arrays
     int sz = output->m_pos.size();
     QVector<double> xspike(sz), yspike(sz);
-    qDebug() << "channel:" << channel;
     for (int j = 0; j < sz; j++)
     {
         double d = output->m_pos.at(j)/time_interval - start_time/time_interval;
@@ -431,14 +431,13 @@ void MainWindow::insertSpikeGraph(QCustomPlot *customPlot, QString label){
         if ((number <= nsamples) && (d >= 0)  ){
             xspike[j] = output->m_pos.at(j);
             yspike[j] = y[number];
-            qDebug() << output->m_pos.at(j);
         }
     }
     customPlot->addGraph();
     customPlot->graph()->setData(xspike, yspike);
     customPlot->graph()->setName("Spike:" + label);
     QPen graphPen;
-    graphPen.setColor(Qt::GlobalColor::black);
+    graphPen.setColor(QColor(255, 0, 0));
     ui->customPlot->graph()->setPen(graphPen);
     ui->customPlot->graph()->setLineStyle(QCPGraph::lsNone);
     customPlot->graph()->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssSquare, 9));
@@ -457,6 +456,7 @@ void MainWindow::insertSpikeGraph(QCustomPlot *customPlot, QString label){
     }
 
     //read file and verify errors, check error code on edflib.h (if 0, no error found)
+    //The file has to be read again... TODO FIX THIS
     if(edfopen_file_readonly(filelocation, &hdr, EDFLIB_READ_ALL_ANNOTATIONS))
     {
       switch(hdr.filetype)
@@ -521,7 +521,7 @@ void MainWindow::insertChannel(QCustomPlot *customPlot, QString label)
   for (int i=0; i<nsamples; ++i)
   {
     x[i] = start_time + i*time_interval; //
-    y[i] = buf[i] + totalGraphs*3000;  //
+    y[i] = buf[i] + totalGraphs*300;  //
   }
 
 
@@ -530,9 +530,9 @@ void MainWindow::insertChannel(QCustomPlot *customPlot, QString label)
   customPlot->graph()->setData(x, y);
   customPlot->graph()->setName(label);
   QPen graphPen;
-  graphPen.setColor(QColor(rand()%245+10, rand()%245+10, rand()%245+10));
+  graphPen.setColor(QColor(0, 0, 0));
   ui->customPlot->graph()->setPen(graphPen);
-  ui->customPlot->yAxis->setRange(-3000,(totalGraphs+1)*3000);
+  ui->customPlot->yAxis->setRange(-300,(totalGraphs+1)*300);
   ui->customPlot->replot();
 
   labelposition[label] = totalGraphs;
@@ -555,7 +555,8 @@ void MainWindow::on_actionChannel_Selector_triggered()
   //create a list with the graphs that are shown in the plot area
   for (int i=0; i < ui->customPlot->graphCount(); i++)
   {
-      showngraphs.append(ui->customPlot->graph(i)->name());
+      if   (!(ui->customPlot->graph(i)->name().contains("Spike")))
+          showngraphs.append(ui->customPlot->graph(i)->name());
   }
 
   //if the graph is not show and is in the shown list, plots the graph
@@ -637,7 +638,7 @@ void MainWindow::showPointToolTip(QMouseEvent *event)
         else
             label = ui->customPlot->plottableAt(event->pos(), false)->name().replace("Spike:","");
         position = labelposition[label];
-        y = y - 3000*position;
+        y = y - 300*position;
         QString toolLabel = ui->customPlot->plottableAt(event->pos(), false)->name().trimmed() + ": " +QString::number(x) + ", "+ QString::number(y) ;
         setToolTip(toolLabel);
     }
@@ -667,6 +668,7 @@ void MainWindow::on_actionFilter_triggered()
     spikeSelector.exec();
 
     insertSpikeGraph(ui->customPlot, spike);
+    shownspikes.append(spike);
 
 }
 
@@ -689,4 +691,12 @@ void MainWindow::on_actionHelp_triggered()
     Help helpwindow;
     helpwindow.setModal(true);
     helpwindow.exec();
+}
+
+void MainWindow::on_actionDetect_All_triggered()
+{
+    foreach (QString str, shown) {
+        if(!shownspikes.contains(str)) insertSpikeGraph(ui->customPlot, str);
+    }
+    shownspikes.append(shown);
 }
